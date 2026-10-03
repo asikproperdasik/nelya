@@ -49,7 +49,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
   text-shadow:0 0 28px rgba(255,150,220,.55)}
 
 .heart{display:block}
-.beat{filter:drop-shadow(0 0 10px rgba(255,255,255,.6));animation:beat 2.6s ease-in-out infinite}
+.beat{animation:beat 2.6s ease-in-out infinite}
 @keyframes beat{0%,60%,100%{transform:scale(1)}15%{transform:scale(1.08)}30%{transform:scale(.98)}}
 
 /* анимация открытия */
@@ -57,19 +57,14 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
   background:radial-gradient(circle,rgba(255,170,230,.75),transparent 65%);opacity:0;pointer-events:none;transform:scale(.4)}
 .card.open .halo{animation:halo 1.6s ease-out .2s}
 @keyframes halo{0%{opacity:0;transform:scale(.4)}35%{opacity:1}100%{opacity:0;transform:scale(3.2)}}
-.inside>*{opacity:0}
-.card.open .inside>*{animation:reveal .9s cubic-bezier(.2,.7,.2,1) both}
-.card.open .inside>:nth-child(1){animation-delay:.75s}
-.card.open .inside>:nth-child(2){animation-delay:1.05s;animation-name:pop}
-.card.open .inside>:nth-child(3){animation-delay:1.3s}
-@keyframes reveal{from{opacity:0;transform:translateY(14px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes reveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{opacity:0;transform:scale(.2)}60%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
-.draw{stroke-dasharray:1;stroke-dashoffset:0;animation:draw 2s ease-out}
-@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.draw{stroke-dasharray:120;stroke-dashoffset:0;animation:draw 2s ease-out}
+@keyframes draw{from{stroke-dashoffset:120}to{stroke-dashoffset:0}}
 
 /* ---------- открытка ---------- */
 .stage{perspective:1400px;width:100%;display:flex;justify-content:center}
-.card{position:relative;width:var(--w);height:calc(var(--w)*1.45);transform-style:preserve-3d;cursor:pointer;
+.card{position:relative;width:var(--w);height:calc(var(--w)*1.45);cursor:pointer;
   transition:transform 1s cubic-bezier(.4,.1,.2,1);animation:bob 3.4s ease-in-out infinite}
 .card.open{transform:translateX(calc(var(--w)/2));animation:none}
 .card.open .inside{animation:lift 1.2s ease-out}
@@ -81,8 +76,8 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
   box-shadow:0 20px 44px rgba(10,0,30,.6)}
 .inside .to{font-family:var(--serif);font-weight:600;font-size:clamp(1.2rem,5.6vw,1.6rem);line-height:1.2}
 .inside .msg{font-family:var(--serif);font-weight:500;font-size:clamp(1rem,4.6vw,1.25rem);line-height:1.4;color:#6a28c4}
-.cover{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.4,.1,.2,1)}
-.card.open .cover{transform:rotateY(-172deg)}
+.cover{position:absolute;inset:0;transform-origin:left center;transform:perspective(1200px) rotateY(0deg);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.4,.1,.2,1)}
+.card.open .cover{transform:perspective(1200px) rotateY(-172deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6px 16px 16px 6px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .front{background:linear-gradient(145deg,#c58cff,#7a35d8 55%,#4b1b94);border:1px solid rgba(255,255,255,.4);
@@ -131,7 +126,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
 @media (prefers-reduced-motion:reduce){.card,.bg i{animation:none}#words{display:none}}
 
 /* страницы открытки */
-.card{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.card{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .inside{padding:20px 16px 26px}
 .page{width:100%;text-align:center;white-space:pre-line;font-family:var(--serif);color:#5a22b0;
   font-size:clamp(1.05rem,4.9vw,1.3rem);line-height:1.45}
@@ -144,7 +139,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
 @keyframes inNext{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
 @keyframes inPrev{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
 .page .pop{animation:pop .8s both,beat 2.6s ease-in-out .9s infinite}
-.card.open .inside>.pgno{animation-name:reveal;animation-delay:1.3s}
+.card.open .inside>.pgno{animation:reveal .9s ease-out 1.3s backwards}
 .pgno{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;color:#8a5fc9}
 .btns{display:flex;gap:10px;justify-content:center;width:100%}
 .btns .btn{padding:14px 20px;font-size:.9rem;letter-spacing:.08em}
@@ -164,20 +159,6 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff9ad5"/><stop offset="1" stop-color="#9b4dff"/>
-    </linearGradient>
-    <symbol id="heart" viewBox="0 0 32 30">
-      <path d="M16 27C6 19.5 2 14.5 2 9.5 2 5.6 5 3 8.5 3c3.2 0 6.1 1.8 7.5 4.6C17.4 4.8 20.3 3 23.5 3 27 3 30 5.6 30 9.5 30 14.5 26 19.5 16 27z" fill="url(#hg)"/>
-    </symbol>
-    <symbol id="heart-line" viewBox="0 0 32 30">
-      <path class="draw" pathLength="1" d="M16 27C6 19.5 2 14.5 2 9.5 2 5.6 5 3 8.5 3c3.2 0 6.1 1.8 7.5 4.6C17.4 4.8 20.3 3 23.5 3 27 3 30 5.6 30 9.5 30 14.5 26 19.5 16 27z" fill="none" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/>
-    </symbol>
-  </defs>
-</svg>
-
 <div class="bg"><i></i><i></i><i></i></div>
 <div id="words"></div>
 
@@ -193,10 +174,10 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
       </div>
       <div class="cover">
         <div class="face front">
-          <svg class="heart beat" width="92" height="86"><use href="#heart-line"/></svg>
+          <svg class="heart beat" width="92" height="86" viewBox="0 0 32 30"><path class="draw" d="M16 27C6 19.5 2 14.5 2 9.5 2 5.6 5 3 8.5 3c3.2 0 6.1 1.8 7.5 4.6C17.4 4.8 20.3 3 23.5 3 27 3 30 5.6 30 9.5 30 14.5 26 19.5 16 27z" fill="none" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/></svg>
           <small>нажми</small>
         </div>
-        <div class="face back"><svg class="heart" width="34" height="32"><use href="#heart"/></svg></div>
+        <div class="face back"><svg class="heart" width="34" height="32" viewBox="0 0 32 30"><path d="M16 27C6 19.5 2 14.5 2 9.5 2 5.6 5 3 8.5 3c3.2 0 6.1 1.8 7.5 4.6C17.4 4.8 20.3 3 23.5 3 27 3 30 5.6 30 9.5 30 14.5 26 19.5 16 27z" fill="#a85df0"/></svg></div>
       </div>
     </div>
   </div>
@@ -300,7 +281,7 @@ function show(i, dir) {
   page.classList.add(dir < 0 ? 'in-prev' : 'in-next');
   pgno.textContent = i === 0 ? 'смахни  →' : (i + 1) + ' / ' + PAGES.length;
   if (t === null) {
-    page.innerHTML = '<svg class="heart pop" width="64" height="60"><use href="#heart"/></svg>';
+    page.innerHTML = '<svg class="heart pop" width="64" height="60" viewBox="0 0 32 30"><path d="M16 27C6 19.5 2 14.5 2 9.5 2 5.6 5 3 8.5 3c3.2 0 6.1 1.8 7.5 4.6C17.4 4.8 20.3 3 23.5 3 27 3 30 5.6 30 9.5 30 14.5 26 19.5 16 27z" fill="#c24fe0"/></svg>';
     return;
   }
   page.innerHTML = '<span class="v"></span><span class="cur"></span><span class="h"></span>';
