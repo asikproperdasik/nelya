@@ -129,6 +129,38 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
 #lb.show{display:flex}
 #lb img{max-width:100%;max-height:100%;border-radius:12px}
 @media (prefers-reduced-motion:reduce){.card,.bg i{animation:none}#words{display:none}}
+
+/* страницы открытки */
+.card{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.inside{padding:20px 16px 26px}
+.page{width:100%;text-align:center;white-space:pre-line;font-family:var(--serif);color:#5a22b0;
+  font-size:clamp(1.05rem,4.9vw,1.3rem);line-height:1.45}
+.page.big{font-size:clamp(1.4rem,6.6vw,1.8rem);color:#4a1d86}
+.page .h{opacity:0}
+.page .cur{display:inline-block;width:1px;height:1.05em;margin-left:2px;vertical-align:-.15em;background:#7b2fd0;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.page.in-next{animation:inNext .45s ease-out}
+.page.in-prev{animation:inPrev .45s ease-out}
+@keyframes inNext{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes inPrev{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+.page .pop{animation:pop .8s both,beat 2.6s ease-in-out .9s infinite}
+.card.open .inside>.pgno{animation-name:reveal;animation-delay:1.3s}
+.pgno{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;color:#8a5fc9}
+.btns{display:flex;gap:10px;justify-content:center;width:100%}
+.btns .btn{padding:14px 20px;font-size:.9rem;letter-spacing:.08em}
+
+/* причины */
+#why{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 0%,#4a2290 0,#1d0c40 60%,#0f0522 100%);padding:20px}
+#why.show{display:flex}
+.whybox{width:min(92vw,420px);text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.whybox h2{font-family:var(--serif);font-weight:400;font-size:1.7rem}
+.reason{min-height:140px;width:100%;display:flex;align-items:center;justify-content:center;padding:22px 18px;border-radius:22px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  font-family:var(--serif);font-size:clamp(1.4rem,7vw,1.9rem);line-height:1.3}
+.reason.swap{animation:reveal .6s ease-out}
+.cnt{font-size:.85rem;opacity:.7;letter-spacing:.12em;margin-top:-10px}
 </style>
 </head>
 <body>
@@ -156,9 +188,8 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
     <div class="card" id="card" role="button" tabindex="0" aria-label="Открыть открытку">
       <div class="halo"></div>
       <div class="inside">
-        <div class="to">For my<br>pretty girl</div>
-        <svg class="heart" width="30" height="28"><use href="#heart"/></svg>
-        <div class="msg">Привет, любимая,<br>удачи тебе</div>
+        <div class="page" id="page"></div>
+        <div class="pgno" id="pgno"></div>
       </div>
       <div class="cover">
         <div class="face front">
@@ -179,7 +210,10 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
     </div>
   </div>
 
-  <button class="btn" id="openGal">Наша история</button>
+  <div class="btns">
+    <button class="btn" id="openGal">Наша история</button>
+    <button class="btn" id="openWhy">Причины</button>
+  </div>
 </main>
 
 <section id="gallery" aria-label="Наша история">
@@ -191,6 +225,16 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
   <div class="scroll">
     <div class="sec"><h2>Воспоминания</h2><div class="grid" id="gShots"></div></div>
     <div class="sec"><h2>Жаным</h2><div class="grid" id="gPics"></div></div>
+  </div>
+</section>
+
+<section id="why" aria-label="Причины">
+  <button class="close" id="closeWhy" aria-label="Закрыть">✕</button>
+  <div class="whybox">
+    <h2>Почему я тебя люблю</h2>
+    <div class="reason" id="reason"></div>
+    <div class="cnt" id="cnt"></div>
+    <button class="btn" id="nextWhy">Ещё причина</button>
   </div>
 </section>
 
@@ -216,13 +260,89 @@ for (let i = 0; i < 22; i++) {
 
 /* открытка */
 const card = document.getElementById('card');
-function toggleCard() {
-  const opening = !card.classList.contains('open');
-  card.classList.toggle('open');
-  if (opening) burst();
+const PAGES = [
+  null,
+  'For my\npretty girl',
+  null,
+  'Привет, любимая',
+  null,
+  'я тебя очень сильно люблю',
+  null,
+  'чтобы тебе не было скучно, расскажу историю',
+  'летом, когда я гулял с 8н, с нами также была Акнур, ее подруги и Асель Р.',
+  'Мы играли в догонялки и когда Даулет убегал, он',
+  'он со всей силы врезался в турник, не увидев его',
+  'потому что было очень темно',
+  'он упал на землю с кровью со рта',
+  'мы в панике стояли все вокруг него',
+  'Асель Р. плакала, уговаривала Даулета пойти домой',
+  'Она успокоилась по пути и уже было все хорошо, но',
+  'но я продолжал плакать по пути до дома Даулета',
+  'потому что мне было его очень жалко',
+  'Я пытался плакать незаметно и пытался успокоиться,',
+  'чтобы не привлекать лишнее внимание',
+  'но у меня не получилось и Асель все таки заметила',
+  'и спросила все ли хорошо',
+  'через несколько дней мы снова встретили',
+  'Даулета и поиграли баскетбол, все круто и все хорошо!!',
+  'люблю тебя жаным',
+  'очень скучаю по тебе'
+];
+const page = document.getElementById('page'), pgno = document.getElementById('pgno');
+let idx = 0, typeTimer = null;
+
+function show(i, dir) {
+  clearTimeout(typeTimer);
+  idx = i;
+  const t = PAGES[i];
+  page.className = 'page' + (i === 1 ? ' big' : '');
+  void page.offsetWidth;
+  page.classList.add(dir < 0 ? 'in-prev' : 'in-next');
+  pgno.textContent = i === 0 ? 'смахни  →' : (i + 1) + ' / ' + PAGES.length;
+  if (t === null) {
+    page.innerHTML = '<svg class="heart pop" width="64" height="60"><use href="#heart"/></svg>';
+    return;
+  }
+  page.innerHTML = '<span class="v"></span><span class="cur"></span><span class="h"></span>';
+  const v = page.querySelector('.v'), h = page.querySelector('.h');
+  let k = 0;
+  h.textContent = t;
+  (function step() {
+    k++;
+    v.textContent = t.slice(0, k);
+    h.textContent = t.slice(k);
+    if (k < t.length) typeTimer = setTimeout(step, ',.!'.includes(t[k - 1]) ? 260 : 45);
+  })();
 }
-card.addEventListener('click', toggleCard);
-card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(); } });
+function go(d) {
+  const n = idx + d;
+  if (n < 0) return;
+  if (n >= PAGES.length) { closeCard(); return; }
+  show(n, d);
+}
+function openCard() {
+  card.classList.add('open'); burst();
+  clearTimeout(typeTimer);
+  typeTimer = setTimeout(() => show(0, 1), 900);
+}
+function closeCard() {
+  card.classList.remove('open');
+  clearTimeout(typeTimer); idx = 0; page.innerHTML = ''; pgno.textContent = '';
+}
+let sx = 0;
+card.addEventListener('pointerdown', e => { sx = e.clientX; });
+card.addEventListener('pointerup', e => {
+  if (!card.classList.contains('open')) { openCard(); return; }
+  const dx = e.clientX - sx;
+  if (Math.abs(dx) > 40) { go(dx < 0 ? 1 : -1); return; }
+  const r = card.getBoundingClientRect();
+  go(e.clientX < r.left + r.width / 2 ? -1 : 1);
+});
+card.addEventListener('keydown', e => {
+  if (!card.classList.contains('open')) { if (e.key === 'Enter' || e.key === ' ') openCard(); return; }
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'ArrowLeft') go(-1);
+});
 function burst() {
   const r = card.getBoundingClientRect();
   for (let i = 0; i < 30; i++) {
@@ -280,6 +400,28 @@ const gal = document.getElementById('gallery'), vid = document.getElementById('b
 openGal.onclick = () => { gal.classList.add('show'); document.body.style.overflow = 'hidden'; vid.play().catch(() => {}); };
 closeGal.onclick = () => { gal.classList.remove('show'); document.body.style.overflow = ''; vid.pause(); };
 lb.onclick = () => lb.classList.remove('show');
+
+/* причины */
+const REASONS = ['ты красавица','ты крутая','ты умница','ты ревнивая','ты часто пишешь первой','ты мне поднимаешь настроение',
+  'ты тактильная','ты всегда возвращаешься ко мне','ты не забываешь про меня','ты понимаешь мои чувства, без моих слов',
+  'у тебя крутой вайб','у тебя красивые глазки','ты хорошо учишься','ты стабильная','ты меня всегда поддерживаешь',
+  'ты мне проявляешь внимание','я не безразличен тебе','ты знакома с зерешкой хахаха','ты меня крепко обнимаешь!!'];
+const LAST = 'я тебя люблю за просто так!!';
+let order = [], ri = 0;
+function shuffleReasons() {
+  order = REASONS.map(r => [Math.random(), r]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  order.push(LAST); ri = 0;
+}
+function nextReason() {
+  if (ri >= order.length) shuffleReasons();
+  reason.textContent = order[ri]; ri++;
+  cnt.textContent = ri + ' из ' + order.length;
+  reason.classList.remove('swap'); void reason.offsetWidth; reason.classList.add('swap');
+  nextWhy.textContent = ri >= order.length ? 'Сначала' : 'Ещё причина';
+}
+openWhy.onclick = () => { shuffleReasons(); why.classList.add('show'); nextReason(); };
+closeWhy.onclick = () => why.classList.remove('show');
+nextWhy.onclick = nextReason;
 </script>
 </body>
 </html>
