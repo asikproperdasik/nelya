@@ -156,6 +156,26 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
   font-family:var(--serif);font-size:clamp(1.4rem,7vw,1.9rem);line-height:1.3}
 .reason.swap{animation:reveal .6s ease-out}
 .cnt{font-size:.85rem;opacity:.7;letter-spacing:.12em;margin-top:-10px}
+
+/* приветствие */
+.greet{font-family:var(--serif);font-size:1.15rem;letter-spacing:.04em;opacity:.9}
+
+/* линия дат */
+.tlwrap{width:min(92vw,420px)}
+.tlt{font-family:var(--serif);font-size:1.15rem;margin-bottom:10px;opacity:.9}
+.tl{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.tl::-webkit-scrollbar{display:none}
+.tltrack{display:flex;width:max-content;padding:2px 14px 4px}
+.tli{flex:0 0 108px;text-align:center}
+.tli .lab{font-family:var(--serif);font-size:1.05rem;margin-bottom:8px;white-space:nowrap}
+.tli .row{position:relative;height:12px}
+.tli .row::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.55)}
+.tli.first .row::before{left:50%}
+.tli .row i{position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;
+  background:#ffb3e1;box-shadow:0 0 12px rgba(255,150,225,.9)}
+.tli.tlend{flex-basis:170px}
+.tli.tlend .row::before{background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.08))}
 </style>
 </head>
 <body>
@@ -163,6 +183,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
 <div id="words"></div>
 
 <main>
+  <div class="greet" id="greet"></div>
   <h1>Открой открытку</h1>
 
   <div class="stage">
@@ -188,6 +209,20 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,10vw,3.4rem);
       <div><b id="y">0</b><span id="yl">год</span></div>
       <div><b id="mo">0</b><span id="ml">месяцев</span></div>
       <div><b id="d">0</b><span id="dl">дней</span></div>
+    </div>
+  </div>
+
+  <div class="tlwrap">
+    <div class="tlt">Наши даты</div>
+    <div class="tl">
+      <div class="tltrack">
+        <div class="tli first"><div class="lab">25 марта</div><div class="row"><i></i></div></div>
+        <div class="tli"><div class="lab">18 августа</div><div class="row"><i></i></div></div>
+        <div class="tli"><div class="lab">x сентября</div><div class="row"><i></i></div></div>
+        <div class="tli"><div class="lab">28 августа</div><div class="row"><i></i></div></div>
+        <div class="tli"><div class="lab">6 сентября</div><div class="row"><i></i></div></div>
+        <div class="tli tlend"><div class="lab">&nbsp;</div><div class="row"></div></div>
+      </div>
     </div>
   </div>
 
@@ -403,6 +438,14 @@ function nextReason() {
 openWhy.onclick = () => { shuffleReasons(); why.classList.add('show'); nextReason(); };
 closeWhy.onclick = () => why.classList.remove('show');
 nextWhy.onclick = nextReason;
+
+/* приветствие по времени суток */
+function greet() {
+  const h = new Date().getHours();
+  const t = h >= 5 && h < 12 ? 'Доброе утро' : h >= 12 && h < 18 ? 'Добрый день' : h >= 18 && h < 23 ? 'Добрый вечер' : 'Спокойной ночи';
+  document.getElementById('greet').textContent = t + ', любимая';
+}
+greet(); setInterval(greet, 60000);
 </script>
 </body>
 </html>
